@@ -77,7 +77,7 @@ def get_movies_by_country(countries):
         # Find movies matching the "countries" list, but only return the title
         # and _id. Do not include a limit in your own implementation, it is
         # included here to avoid sending 46000 documents down the wire.
-        return list(db.movies.find().limit(1))
+        return list(db.movies.find({"countries": {"$in": countries}}, {"title":1}))
 
     except Exception as e:
         return e
@@ -151,7 +151,13 @@ def get_movies_faceted(filters, page, movies_per_page):
 
     # TODO: Faceted Search
     # Add the necessary stages to the pipeline variable in the correct order.
-    pipeline = []
+    pipeline.append(skip_stage)
+    pipeline.append(limit_stage)
+    pipeline.append(facet_stage)
+
+    # or
+    # pipeline.extend([skip_stage, limit_stage, facet_stage])
+
 
     try:
         movies = list(db.movies.aggregate(pipeline, allowDiskUse=True))[0]
@@ -194,7 +200,7 @@ def build_query_sort_project(filters):
 
             # TODO: Text and Subfield Search
             # Construct a query that will search for the chosen genre.
-            query = {}
+            query = {"genres":{"$in":filters["genres"]}}
 
     return query, sort, project
 
@@ -213,14 +219,15 @@ def get_movies(filters, page, movies_per_page):
     Returns 2 elements in a tuple: (movies, total_num_movies)
     """
     query, sort, project = build_query_sort_project(filters)
-    if project:
+    if project and sort:
         cursor = db.movies.find(query, project).sort(sort)
-    else:
+    elif project:
         cursor = db.movies.find(query).sort(sort)
+    else:
+        cursor = db.movies.find(query)
 
-    total_num_movies = 0
-    if page == 0:
-        total_num_movies = db.movies.count_documents(query)
+    total_num_movies = cursor.count()
+
     """
     Ticket: Paging
 
@@ -234,7 +241,8 @@ def get_movies(filters, page, movies_per_page):
 
     # TODO: Paging
     # Use the cursor to only return the movies that belong on the current page.
-    movies = cursor.limit(movies_per_page)
+    
+    movies = cursor.skip(page*movies_per_page).limit(movies_per_page)
 
     return (list(movies), total_num_movies)
 

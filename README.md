@@ -18,7 +18,10 @@ The course README is thorough however some small tips from the below may assist 
 
 ### The only files to alter
 - several files in this project should not be altered so as to prevent breaking changes
-- mflix/db.py and dotini_windows will require changes
+- files that will require changes are:
+  - ```path\to\your\mflix-python\mflix\db.py```
+  - ```path\to\your\mflix-python\dotini_windows``` (to be renamed as .ini for use)
+  - ```path\to\your\mflix-python\build\index.html```
 
 ### Setting up virtualenv for the project
 - download the handout provided in Chapter 0
