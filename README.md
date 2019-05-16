@@ -16,6 +16,10 @@ It also assumes some knowledge of MongoDB and that the user has the mongo shell 
 
 The course README is thorough however some small tips from the below may assist future students with the setup of the environment, these are bolded.
 
+### The only files to alter
+- several files in this project should not be altered so as to prevent breaking changes
+- mflix/db.py and dotini_windows will require changes
+
 ### Setting up virtualenv for the project
 - download the handout provided in Chapter 0
 - extract to a directory of your choosing naming the folder mflix-python
@@ -64,12 +68,14 @@ The course README is thorough however some small tips from the below may assist 
 ### Running the project
 Now that you have a **working virtualenv (currently deactivated) and working Atlas cluster (not currently connected in the mongo shell)** you're close to running the project.
 
-- firstly, import some the data provided to your cluster
-  - your\path\to\mflix-python>```mongorestore --drop --gzip --uri mongodb+srv://m220student:m220password@<YOUR_CLUSTER_URI> data```
-- in Windows, either using your favourite text editor locate your mflix-python directory open the dotini_windows file
+- firstly, import some the data provided to your cluster but activate the virtual environment first (importing data outside the virtual errors resulted in running into search query errors later)
+  - your\path\to\mflix-python> ```mflix_venv\Scripts\activate ```
+  - (mflix_venv) your\path\to\mflix-python>```mongorestore --drop --gzip --uri mongodb+srv://m220student:m220password@<YOUR_CLUSTER_URI> data```
+- in Windows, using your favourite text editor, locate your mflix-python directory and open the dotini_windows file
 - change the file to link your atlas cluster info ``` MFLIX_DB_URI = mongodb+srv://m220student:m220password@YOUR_ATLAS_URL_LINK_HERE ```
 - you can use the same for both test and prod
 - **rename this file to ```.ini```**
+- you can add a super secret key to the prod section, of your own design
 - save and close this file
 - in command prompt navigate to the mflix-python directory and activate the virtual environment again
   - your\path\to\mflix-python> ```mflix_venv\Scripts\activate ```
@@ -81,3 +87,16 @@ Now that you have a **working virtualenv (currently deactivated) and working Atl
     - Debugger PIN: pin here
     - Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
 - in your browser navigate to localhost:5000 and you should see the project
+- you can leave it running here, any syntax errors or breaking changes in the db.py should stop the process and provide errors
+
+### Following the course in Jupyter Notebooks
+- your\path\to\mflix-python> ```cd notebooks```
+- your\path\to\mflix-python>notebooks> ``` Jupyter notebook ```
+- this will provide a URL link where you can find how the course material was created and follow along if you wish
+- note however that on each section you will need to update the client link to match your cluster link, the sam link you provided in the .ini file
+- you can run the queries set up by the course instructors here on your cluster and data and read through the logic as provided in the videos
+
+### To run the unit tests when doing the course
+- you can activate a new instance of the virtual environment (rather than using the one that is actively running the project)
+- from the new instance you can run the relevant test
+  - (mflix_venv) your\path\to\mflix-python> ``` pytest -m LAB_UNIT_TEST_NAME ```
